@@ -1,0 +1,20 @@
+PODS:
+  - FBSnapshotTestCase (1.4)
+  - HLDigitInputField (0.1.0):
+    - PureLayout
+  - PureLayout (2.0.4)
+
+DEPENDENCIES:
+  - FBSnapshotTestCase
+  - HLDigitInputField (from `../`)
+
+EXTERNAL SOURCES:
+  HLDigitInputField:
+    :path: ../
+
+SPEC CHECKSUMS:
+  FBSnapshotTestCase: f9f225b5ba11c8d8c09075590490df16314e4d62
+  HLDigitInputField: c8210f14320d4034a442efbc896cd44aa605ee9b
+  PureLayout: ddf4fedf7e2f5984f972bbd2205dda4fc3418347
+
+COCOAPODS: 0.34.4

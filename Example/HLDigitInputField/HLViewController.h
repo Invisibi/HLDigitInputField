@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class HLDigitInputTextField;
+
 @interface HLViewController : UIViewController
+
+@property (weak, nonatomic) IBOutlet HLDigitInputTextField *digitInputTextField;
 
 @end
