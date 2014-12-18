@@ -5,6 +5,10 @@
 [![License](https://img.shields.io/cocoapods/l/HLDigitInputField.svg?style=flat)](http://cocoadocs.org/docsets/HLDigitInputField)
 [![Platform](https://img.shields.io/cocoapods/p/HLDigitInputField.svg?style=flat)](http://cocoadocs.org/docsets/HLDigitInputField)
 
+## Sample
+
+![Sample](https://raw.githubusercontent.com/Invisibi/HLDigitInputField/master/Sample.png "Sample")
+
 ## Usage
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
