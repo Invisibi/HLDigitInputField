@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, HLDigitInputFieldStyle) {
+    HLDigitInputFieldStyleUnderline,
+    HLDigitInputFieldStyleMiddle,
+};
+
 @class HLDigitInputField;
 
-@protocol HLDigitInputFieldDelegate <NSObject>
+@protocol HLDigitInputFieldDelegate<NSObject>
 
 - (void)digitInputTextField:(HLDigitInputField *)textField didFinishWithText:(NSString *)text;
 
@@ -20,7 +25,7 @@
 
 @property (nonatomic) id<HLDigitInputFieldDelegate> delegate;
 
-@property (nonatomic) NSInteger digits;
+@property (nonatomic) NSUInteger digits;
 @property (nonatomic) UIKeyboardType keyboardType;
 @property (nonatomic) UIFont *font;
 @property (nonatomic) UIColor *textColor;
@@ -28,5 +33,6 @@
 @property (nonatomic) NSString *text;
 @property (nonatomic) UIEdgeInsets digitEdgeInsets;
 @property (nonatomic) BOOL upperString;
+@property (nonatomic) HLDigitInputFieldStyle style;
 
 @end

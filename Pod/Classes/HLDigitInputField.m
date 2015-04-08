@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 invisibi. All rights reserved.
 //
 #import <PureLayout/PureLayout.h>
+#import <HLDigitInputField/HLDigitInputField.h>
 
 #import "HLDigitInputField.h"
 
@@ -23,8 +24,7 @@ static const NSInteger kDefaultDigits = 4;
 
 @implementation HLDigitInputField
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         [self _setUpView];
@@ -32,8 +32,7 @@ static const NSInteger kDefaultDigits = 4;
     return self;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder
-{
+- (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
         [self _setUpView];
@@ -41,8 +40,7 @@ static const NSInteger kDefaultDigits = 4;
     return self;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame
-{
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         [self _setUpView];
@@ -50,25 +48,21 @@ static const NSInteger kDefaultDigits = 4;
     return self;
 }
 
-- (BOOL)canBecomeFirstResponder
-{
+- (BOOL)canBecomeFirstResponder {
     return YES;
 }
 
-- (BOOL)becomeFirstResponder
-{
+- (BOOL)becomeFirstResponder {
     return [self.textField becomeFirstResponder];
 }
 
-- (BOOL)resignFirstResponder
-{
+- (BOOL)resignFirstResponder {
     return [self.textField resignFirstResponder];
 }
 
 #pragma mark - Setter
 
-- (void)setFont:(UIFont *)font
-{
+- (void)setFont:(UIFont *)font {
     _font = font;
     if (![_font isEqual:font]) {
         for (UILabel *label in self.digitLabels) {
@@ -78,93 +72,92 @@ static const NSInteger kDefaultDigits = 4;
     }
 }
 
-- (void)setDigits:(NSInteger)digits
-{
+- (void)setDigits:(NSUInteger)digits {
     if (_digits != digits) {
         _digits = digits;
         [self _setUpDigitLabels];
     }
 }
 
-- (void)setTextColor:(UIColor *)textColor
-{
+- (void)setTextColor:(UIColor *)textColor {
     _textColor = textColor;
     for (UILabel *label in self.digitLabels) {
         label.textColor = textColor;
     }
 }
 
-- (void)setBorderColor:(UIColor *)borderColor
-{
+- (void)setBorderColor:(UIColor *)borderColor {
     _borderColor = borderColor;
     for (UIView *view in self.borderViews) {
         view.backgroundColor = borderColor;
     }
 }
 
-- (void)setDigitEdgeInsets:(UIEdgeInsets)edgeInsets
-{
+- (void)setDigitEdgeInsets:(UIEdgeInsets)edgeInsets {
     if (!UIEdgeInsetsEqualToEdgeInsets(_digitEdgeInsets, edgeInsets)) {
         _digitEdgeInsets = edgeInsets;
         [self _setUpDigitLabels];
     }
 }
 
-- (void)setKeyboardType:(UIKeyboardType)keyboardType
-{
+- (void)setStyle:(HLDigitInputFieldStyle)style {
+    _style = style;
+    [self _setUpDigitLabels];
+}
+
+- (void)setKeyboardType:(UIKeyboardType)keyboardType {
     _keyboardType = keyboardType;
     self.textField.keyboardType = keyboardType;
 }
 
-- (void)setText:(NSString *)text
-{
+- (void)setText:(NSString *)text {
     if (self.upperString) {
         text = [text uppercaseString];
     }
-    
+
     self.textField.text = text;
     for (NSInteger i = 0; i < self.digitLabels.count; i++) {
         UILabel *label = self.digitLabels[i];
         if (i >= text.length) {
             label.text = nil;
+            [self.borderViews[i] setHidden:NO];
         } else {
             label.text = [text substringWithRange:NSMakeRange(i, 1)];
+            if (self.style == HLDigitInputFieldStyleMiddle) {
+                [self.borderViews[i] setHidden:YES];
+            }
         }
     }
-    
+
     if (text.length == self.digits) {
         [self.delegate digitInputTextField:self didFinishWithText:text];
     }
 }
 
-- (NSString *)text
-{
+- (NSString *)text {
     return self.textField.text;
 }
 
 #pragma mark - UITextFieldDelegate
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *result = [textField.text stringByReplacingCharactersInRange:range withString:string];
     self.text = result;
-    
+
     return NO;
 }
 
 #pragma mark - Private Helper
 
-- (void)_setUpView
-{
+- (void)_setUpView {
     [self _setUpDefaultValues];
     [self _setUpDigitLabels];
     [self _setUpTextField];
     [self _setUpTapGestureRecognizer];
-    
+
 }
 
-- (void)_setUpDefaultValues
-{
+- (void)_setUpDefaultValues {
     self.digits = kDefaultDigits;
     self.font = [UIFont boldSystemFontOfSize:24.f];
     self.textColor = [UIColor whiteColor];
@@ -173,28 +166,28 @@ static const NSInteger kDefaultDigits = 4;
     self.digitEdgeInsets = UIEdgeInsetsZero;
     self.labelWidthConstraints = [NSMutableArray array];
     self.labelHeightConstraints = [NSMutableArray array];
+    self.style = HLDigitInputFieldStyleUnderline;
 }
 
-- (void)_setUpDigitLabels
-{
+- (void)_setUpDigitLabels {
     [self.labelWidthConstraints removeAllObjects];
     [self.labelHeightConstraints removeAllObjects];
-    
+
     for (UIView *digitLabel in self.digitLabels) {
         [digitLabel.superview removeFromSuperview];
     }
-    
+
     if (!self.digits) {
         return;
     }
-    
+
     NSMutableArray *digitLabels = [NSMutableArray arrayWithCapacity:self.digits];
     NSMutableArray *borderViews = [NSMutableArray arrayWithCapacity:self.digits];
     UIView *prevContainer;
     CGSize size = [self _sizeForFont:self.font];
     for (NSInteger i = 0; i < self.digits; i++) {
         UIView *containerView = [[UIView alloc] initForAutoLayout];
-        
+
         UILabel *label = [[UILabel alloc] initForAutoLayout];
         label.font = self.font;
         label.textAlignment = NSTextAlignmentCenter;
@@ -205,7 +198,7 @@ static const NSInteger kDefaultDigits = 4;
         [self.labelWidthConstraints addObject:[label autoSetDimension:ALDimensionWidth toSize:size.width]];
         [self.labelHeightConstraints addObject:[label autoSetDimension:ALDimensionHeight toSize:size.height]];
         [label autoPinEdgesToSuperviewEdgesWithInsets:self.digitEdgeInsets];
-        
+
         UIView *underLine = [[UIView alloc] initForAutoLayout];
         underLine.backgroundColor = self.borderColor;
         underLine.layer.cornerRadius = 1.f;
@@ -213,8 +206,14 @@ static const NSInteger kDefaultDigits = 4;
         [borderViews addObject:underLine];
         [containerView addSubview:underLine];
         [underLine autoSetDimension:ALDimensionHeight toSize:2.f];
-        [underLine autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsZero excludingEdge:ALEdgeTop];
-        
+        if (self.style == HLDigitInputFieldStyleUnderline) {
+            [underLine autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsZero excludingEdge:ALEdgeTop];
+        } else if (self.style == HLDigitInputFieldStyleMiddle) {
+            [underLine autoPinEdgeToSuperviewEdge:ALEdgeLeft];
+            [underLine autoPinEdgeToSuperviewEdge:ALEdgeRight];
+            [underLine autoAlignAxisToSuperviewAxis:ALAxisHorizontal];
+        }
+
         [self addSubview:containerView];
         [containerView autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:0.f];
         [containerView autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:0.f];
@@ -228,13 +227,12 @@ static const NSInteger kDefaultDigits = 4;
         [containerView autoPinEdge:ALEdgeLeft toEdge:ALEdgeRight ofView:prevContainer withOffset:10.f];
         prevContainer = containerView;
     }
-    
+
     self.borderViews = borderViews;
     self.digitLabels = digitLabels;
 }
 
-- (CGSize)_sizeForFont:(UIFont *)font
-{
+- (CGSize)_sizeForFont:(UIFont *)font {
     UILabel *placeholder = [[UILabel alloc] init];
     placeholder.text = @"@";
     placeholder.font = font;
@@ -242,8 +240,7 @@ static const NSInteger kDefaultDigits = 4;
     return placeholder.bounds.size;
 }
 
-- (void)_setUpTextField
-{
+- (void)_setUpTextField {
     UITextField *textField = [[UITextField alloc] initWithFrame:CGRectZero];
     textField.delegate = self;
     textField.keyboardType = UIKeyboardTypeNumberPad;
@@ -251,19 +248,16 @@ static const NSInteger kDefaultDigits = 4;
     self.textField = textField;
 }
 
-- (void)_setUpTapGestureRecognizer
-{
+- (void)_setUpTapGestureRecognizer {
     UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_tapped:)];
     [self addGestureRecognizer:tapGestureRecognizer];
 }
 
-- (void)_tapped:(UITapGestureRecognizer *)gestureRecognizer
-{
+- (void)_tapped:(UITapGestureRecognizer *)gestureRecognizer {
     [self becomeFirstResponder];
 }
 
-- (void)_updateDigitLabelsSizeConstraints
-{
+- (void)_updateDigitLabelsSizeConstraints {
     CGSize size = [self _sizeForFont:self.font];
     for (NSLayoutConstraint *constraint in self.labelWidthConstraints) {
         constraint.constant = size.width;
