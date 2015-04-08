@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "HLDigitInputField"
-  s.version          = "0.9.1"
+  s.version          = "0.9.2"
   s.summary          = "A customizable text field let user input digit one by one."
   s.description      = <<-DESC
                        * Markdown format.
